@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoSAC — Sistema de Atendimento ao Cliente</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand"><i class="ti ti-car"></i><span>AutoSAC</span></div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-page="novo-atendimento" onclick="navigateTo(event,'novo-atendimento')"><i class="ti ti-plus"></i><span>Novo atendimento</span></a>
+      <a href="#" class="nav-item" data-page="followups" onclick="navigateTo(event,'followups')"><i class="ti ti-calendar-due"></i><span>Follow-ups</span><span class="nav-badge" id="badge-followups">3</span></a>
+      <a href="#" class="nav-item" data-page="clientes" onclick="navigateTo(event,'clientes')"><i class="ti ti-users"></i><span>Clientes</span></a>
+      <a href="#" class="nav-item" data-page="historico" onclick="navigateTo(event,'historico')"><i class="ti ti-history"></i><span>Histórico</span></a>
+      <a href="#" class="nav-item" data-page="relatorios" onclick="navigateTo(event,'relatorios')"><i class="ti ti-chart-bar"></i><span>Relatórios</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info"><div class="avatar">AN</div><div><div class="user-name">Ana Lima</div><div class="user-role">Atendente</div></div></div>
+    </div>
+  </aside>
+  <main class="main" id="main">
+    <header class="topbar">
+      <button class="menu-toggle" onclick="toggleSidebar()"><i class="ti ti-menu-2"></i></button>
+      <div class="topbar-title" id="topbar-title">Novo atendimento</div>
+      <div class="topbar-actions">
+        <div class="alert-indicator" onclick="navigateTo(event,'followups')"><i class="ti ti-bell"></i><span class="alert-dot"></span></div>
+        <div class="date-display" id="current-date"></div>
+      </div>
+    </header>
+    <div class="page-content">
+
+      <!-- NOVO ATENDIMENTO -->
+      <section class="page active" id="page-novo-atendimento">
+        <div class="metrics-row">
+          <div class="metric-card"><div class="metric-val">12</div><div class="metric-lbl">Atendimentos hoje</div></div>
+          <div class="metric-card danger"><div class="metric-val">3</div><div class="metric-lbl">Follow-ups em atraso</div></div>
+          <div class="metric-card success"><div class="metric-val">87%</div><div class="metric-lbl">Satisfação (30 dias)</div></div>
+          <div class="metric-card info"><div class="metric-val">5</div><div class="metric-lbl">Potencial troca (1 ano)</div></div>
+        </div>
+        <div class="alert-strip">
+          <i class="ti ti-bell-ringing"></i>
+          <span>3 follow-ups pendentes hoje: <strong>João Silva</strong> (1º contato D+5), <strong>Maria Souza</strong> (mensal), <strong>Pedro Costa</strong> (1 ano)</span>
+          <button class="btn-link" onclick="navigateTo(event,'followups')">Ver todos <i class="ti ti-arrow-right"></i></button>
+        </div>
+        <form id="form-atendimento" onsubmit="salvarAtendimento(event)" novalidate>
+
+          <!-- CLIENTE -->
+          <div class="card">
+            <div class="card-header"><i class="ti ti-user"></i><span>Dados do cliente</span><span class="card-subtitle">Identificação e contato</span></div>
+            <div class="card-body">
+              <div class="grid g3">
+                <div class="field"><label for="cli-nome">Nome completo <span class="req">*</span></label><input type="text" id="cli-nome" placeholder="Nome do cliente" required></div>
+                <div class="field"><label for="cli-cpf">CPF</label><input type="text" id="cli-cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
+                <div class="field"><label for="cli-nasc">Data de nascimento</label><input type="date" id="cli-nasc"></div>
+              </div>
+              <div class="grid g3">
+                <div class="field"><label for="cli-tel">Telefone / WhatsApp <span class="req">*</span></label><input type="tel" id="cli-tel" placeholder="(00) 00000-0000" oninput="maskTel(this)"></div>
+                <div class="field"><label for="cli-email">E-mail</label><input type="email" id="cli-email" placeholder="email@exemplo.com"></div>
+                <div class="field"><label for="cli-cidade">Cidade / UF</label><input type="text" id="cli-cidade" placeholder="Ex: São Paulo / SP"></div>
+              </div>
+              <div class="field"><label for="cli-obs">Observações do cliente</label><input type="text" id="cli-obs" placeholder="Ex: cliente VIP, indicação, preferências de contato..."></div>
+            </div>
+          </div>
+
+          <!-- VEÍCULO -->
+          <div class="card">
+            <div class="card-header"><i class="ti ti-car"></i><span>Dados do veículo</span><span class="card-subtitle">Identificação e venda</span></div>
+            <div class="card-body">
+              <div class="grid g4">
+                <div class="field"><label for="vei-tipo">Tipo do veículo <span class="req">*</span></label><select id="vei-tipo" onchange="atualizarGarantia()" required><option value="">Selecione</option><option value="zero">0 km (novo)</option><option value="usado">Usado</option></select></div>
+                <div class="field"><label for="vei-marca">Marca <span class="req">*</span></label><select id="vei-marca" onchange="carregarModelos()" required><option value="">Selecione</option></select></div>
+                <div class="field"><label for="vei-modelo">Modelo <span class="req">*</span></label><select id="vei-modelo" required><option value="">Selecione a marca</option></select></div>
+                <div class="field"><label for="vei-ano">Ano fab./modelo</label><input type="text" id="vei-ano" placeholder="Ex: 2023/2024"></div>
+              </div>
+              <div class="grid g4">
+                <div class="field"><label for="vei-placa">Placa</label><input type="text" id="vei-placa" placeholder="AAA-0A00" maxlength="8" oninput="maskPlaca(this)"></div>
+                <div class="field"><label for="vei-cor">Cor</label><input type="text" id="vei-cor" placeholder="Ex: Prata metálico"></div>
+                <div class="field"><label for="vei-km">Km na venda</label><input type="number" id="vei-km" placeholder="0" min="0"></div>
+                <div class="field"><label for="vei-data-venda">Data da venda <span class="req">*</span></label><input type="date" id="vei-data-venda" onchange="atualizarGarantia()" required></div>
+              </div>
+              <div class="grid g3">
+                <div class="field"><label for="vei-chassi">Chassi / RENAVAM</label><input type="text" id="vei-chassi" placeholder="Número do chassi"></div>
+                <div class="field"><label for="vei-preco">Valor de venda (R$)</label><input type="text" id="vei-preco" placeholder="R$ 0,00" oninput="maskMoeda(this)"></div>
+                <div class="field"><label for="vei-km-atual">Km atual do veículo</label><input type="number" id="vei-km-atual" placeholder="Km atual" min="0" onchange="atualizarGarantia()"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- GARANTIA -->
+          <div class="card">
+            <div class="card-header"><i class="ti ti-shield-check"></i><span>Garantia da loja</span><span class="card-subtitle">Câmbio, freios e motor</span></div>
+            <div class="card-body">
+              <div class="garantia-info-box" id="garantia-info-box"><i class="ti ti-info-circle"></i><span>Selecione o tipo de veículo e a data de venda para calcular automaticamente a garantia.</span></div>
+              <div class="garantia-grid" id="garantia-grid" style="display:none">
+                <div class="garantia-item"><div class="garantia-icon"><i class="ti ti-settings"></i></div><div class="garantia-info"><div class="garantia-label">Câmbio</div><div class="garantia-status" id="g-cambio-status">—</div></div><span class="garantia-badge" id="g-cambio-badge">—</span></div>
+                <div class="garantia-item"><div class="garantia-icon"><i class="ti ti-brake"></i></div><div class="garantia-info"><div class="garantia-label">Freios</div><div class="garantia-status" id="g-freios-status">—</div></div><span class="garantia-badge" id="g-freios-badge">—</span></div>
+                <div class="garantia-item"><div class="garantia-icon"><i class="ti ti-engine"></i></div><div class="garantia-info"><div class="garantia-label">Motor</div><div class="garantia-status" id="g-motor-status">—</div></div><span class="garantia-badge" id="g-motor-badge">—</span></div>
+              </div>
+              <div class="field" style="margin-top:1rem"><label for="garantia-obs">Observações de garantia</label><input type="text" id="garantia-obs" placeholder="Ex: avaria pré-existente, exclusões, condições especiais..."></div>
+            </div>
+          </div>
+
+          <!-- SEGURO -->
+          <div class="card">
+            <div class="card-header"><i class="ti ti-lock"></i><span>Seguro do veículo</span><span class="card-subtitle">Cobertura e apólice</span></div>
+            <div class="card-body">
+              <div class="toggle-row">
+                <span class="toggle-label">O veículo possui seguro?</span>
+                <div class="btn-toggle-group" id="tg-seguro">
+                  <button type="button" class="btn-toggle" onclick="toggleField('tg-seguro',this,'sim','sec-seguro-det')">Sim</button>
+                  <button type="button" class="btn-toggle" onclick="toggleField('tg-seguro',this,'nao','sec-seguro-det')">Não</button>
+                </div>
+              </div>
+              <div id="sec-seguro-det" style="display:none;margin-top:1rem">
+                <div class="toggle-row" style="margin-bottom:1rem">
+                  <span class="toggle-label">Seguro contratado pela loja?</span>
+                  <div class="btn-toggle-group" id="tg-seguro-loja">
+                    <button type="button" class="btn-toggle" onclick="toggleField('tg-seguro-loja',this,'sim','sec-seguro-loja-det')">Sim</button>
+                    <button type="button" class="btn-toggle" onclick="toggleField('tg-seguro-loja',this,'nao','sec-seguro-loja-det')">Não</button>
+                  </div>
+                </div>
+                <div id="sec-seguro-loja-det" style="display:none">
+                  <div class="grid g3">
+                    <div class="field"><label for="seg-seguradora">Seguradora</label><select id="seg-seguradora"><option value="">Selecione</option><option>Allianz</option><option>Porto Seguro</option><option>Bradesco Seguros</option><option>Itaú Seguros</option><option>Azul Seguros</option><option>HDI Seguros</option><option>Zurich</option><option>Liberty Seguros</option><option>Mapfre</option><option>Outra</option></select></div>
+                    <div class="field"><label for="seg-apolice">Nº da apólice</label><input type="text" id="seg-apolice" placeholder="000000000000"></div>
+                    <div class="field"><label for="seg-vencimento">Vencimento</label><input type="date" id="seg-vencimento"></div>
+                  </div>
+                </div>
+                <div class="field" style="margin-top:.5rem"><label for="seg-cobertura">Tipo de cobertura</label><select id="seg-cobertura"><option value="">Selecione</option><option>Compreensivo (colisão + roubo + terceiros)</option><option>Roubo e furto</option><option>Responsabilidade civil (terceiros)</option><option>Incêndio e roubo</option><option>Básico (perda total)</option></select></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ATENDIMENTO -->
+          <div class="card">
+            <div class="card-header"><i class="ti ti-headset"></i><span>Registro do atendimento</span><span class="card-subtitle">Canal, relato e encaminhamento</span></div>
+            <div class="card-body">
+              <div class="grid g3" style="margin-bottom:1rem">
+                <div class="field"><label for="at-funcionario">Funcionário responsável <span class="req">*</span></label><select id="at-funcionario" required><option value="">Selecione</option><option>Ana Lima</option><option>Carlos Mendes</option><option>Fernanda Rocha</option><option>Lucas Pires</option><option>Rafael Souza</option><option>Outro</option></select></div>
+                <div class="field"><label for="at-data">Data / hora <span class="req">*</span></label><input type="datetime-local" id="at-data" required></div>
+                <div class="field"><label for="at-motivo">Motivo do contato <span class="req">*</span></label><select id="at-motivo" required><option value="">Selecione</option><option>Follow-up pós-venda (1º contato D+5)</option><option>Follow-up mensal</option><option>Interesse em troca de veículo</option><option>Dúvida sobre garantia</option><option>Solicitação de revisão / serviço</option><option>Reclamação</option><option>Elogio</option><option>Sinistro / acionamento de seguro</option><option>Problema mecânico</option><option>Dúvida sobre documentação</option><option>Atendimento proativo</option><option>Outro</option></select></div>
+              </div>
+              <div class="field" style="margin-bottom:1rem">
+                <label>Canal de atendimento <span class="req">*</span></label>
+                <div class="canal-group" id="canal-group">
+                  <button type="button" class="canal-btn" onclick="selecionaCanal(this,'Ligação')"><i class="ti ti-phone"></i> Ligação</button>
+                  <button type="button" class="canal-btn" onclick="selecionaCanal(this,'WhatsApp')"><i class="ti ti-brand-whatsapp"></i> WhatsApp</button>
+                  <button type="button" class="canal-btn" onclick="selecionaCanal(this,'E-mail')"><i class="ti ti-mail"></i> E-mail</button>
+                  <button type="button" class="canal-btn" onclick="selecionaCanal(this,'Presencial')"><i class="ti ti-building-store"></i> Presencial</button>
+                </div>
+                <input type="hidden" id="at-canal">
+              </div>
+              <div class="grid g2" style="margin-bottom:1rem">
+                <div class="field"><label for="at-relato">Relato do atendimento <span class="req">*</span></label><textarea id="at-relato" rows="4" placeholder="Descreva o que foi discutido, solicitado ou relatado pelo cliente..." required></textarea></div>
+                <div class="field"><label for="at-encaminhamento">Ação tomada / encaminhamento</label><textarea id="at-encaminhamento" rows="4" placeholder="Ex: agendada revisão, enviado orçamento, redirecionado para garantia, sinistro aberto..."></textarea></div>
+              </div>
+              <div class="field" style="margin-bottom:1rem">
+                <label>Satisfação do cliente (NPS 0–10)</label>
+                <div class="nps-row" id="nps-row"></div>
+                <div class="nps-labels"><span>Muito insatisfeito</span><span>Neutro</span><span>Muito satisfeito</span></div>
+              </div>
+              <input type="hidden" id="at-nps" value="">
+            </div>
+          </div>
+
+          <!-- FOLLOW-UP -->
+          <div class="card">
+            <div class="card-header"><i class="ti ti-calendar-event"></i><span>Próximo follow-up</span><span class="card-subtitle">Agendamento automático</span></div>
+            <div class="card-body">
+              <div class="grid g3" style="margin-bottom:1rem">
+                <div class="field"><label for="fu-data">Data prevista</label><input type="date" id="fu-data"></div>
+                <div class="field"><label for="fu-tipo">Tipo</label><select id="fu-tipo"><option>1º contato (D+5)</option><option>Mensal</option><option>Anual (interesse em troca)</option><option>Pós-revisão</option><option>Pós-sinistro</option><option>Retorno agendado</option><option>Vencimento de seguro</option></select></div>
+                <div class="field"><label for="fu-responsavel">Responsável</label><select id="fu-responsavel"><option>Ana Lima</option><option>Carlos Mendes</option><option>Fernanda Rocha</option><option>Lucas Pires</option><option>Rafael Souza</option></select></div>
+              </div>
+              <div class="field" style="margin-bottom:1rem"><label for="fu-lembrete">Lembrete para o próximo contato</label><input type="text" id="fu-lembrete" placeholder="Ex: perguntar sobre experiência com o câmbio, verificar interesse em acessórios..."></div>
+              <div class="divider"></div>
+              <div class="toggle-row" style="margin-top:1rem">
+                <span class="toggle-label"><i class="ti ti-refresh" style="font-size:14px;margin-right:4px"></i> Cliente demonstrou interesse em trocar o veículo?</span>
+                <div class="btn-toggle-group" id="tg-troca">
+                  <button type="button" class="btn-toggle" onclick="toggleTroca(this,'sim')">Sim</button>
+                  <button type="button" class="btn-toggle" onclick="toggleTroca(this,'talvez')">Talvez</button>
+                  <button type="button" class="btn-toggle" onclick="toggleTroca(this,'nao')">Não</button>
+                </div>
+              </div>
+              <div id="sec-troca-det" style="display:none;margin-top:1rem">
+                <div class="grid g3">
+                  <div class="field"><label for="tr-interesse">Veículo de interesse</label><input type="text" id="tr-interesse" placeholder="Ex: SUV, elétrico, picape..."></div>
+                  <div class="field"><label for="tr-prazo">Prazo estimado</label><select id="tr-prazo"><option>Imediato (até 30 dias)</option><option>3 meses</option><option>6 meses</option><option>1 ano</option><option>Mais de 1 ano</option></select></div>
+                  <div class="field"><label for="tr-entrada">Entrada estimada</label><input type="text" id="tr-entrada" placeholder="R$ 0,00" oninput="maskMoeda(this)"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" onclick="limparFormulario()"><i class="ti ti-trash"></i> Limpar campos</button>
+            <div style="display:flex;gap:.5rem">
+              <button type="button" class="btn btn-outline" onclick="salvarRascunho()"><i class="ti ti-device-floppy"></i> Salvar rascunho</button>
+              <button type="submit" class="btn btn-primary"><i class="ti ti-check"></i> Registrar atendimento</button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <!-- FOLLOW-UPS -->
+      <section class="page" id="page-followups">
+        <div class="page-header"><h1>Follow-ups pendentes</h1><div class="page-header-actions"><select class="select-sm" id="fu-filtro" onchange="filtrarFollowups()"><option value="todos">Todos os status</option><option value="atrasado">Atrasados</option><option value="hoje">Hoje</option><option value="proximo">Próximos 7 dias</option></select></div></div>
+        <div id="followup-list"></div>
+      </section>
+
+      <!-- CLIENTES -->
+      <section class="page" id="page-clientes">
+        <div class="page-header"><h1>Clientes cadastrados</h1><button class="btn btn-primary btn-sm" onclick="navigateTo(event,'novo-atendimento')"><i class="ti ti-plus"></i> Novo atendimento</button></div>
+        <div class="search-bar"><i class="ti ti-search"></i><input type="text" placeholder="Buscar por nome, CPF, placa ou modelo..." id="cli-search" oninput="filtrarClientes()"></div>
+        <div id="clientes-list"></div>
+      </section>
+
+      <!-- HISTÓRICO -->
+      <section class="page" id="page-historico">
+        <div class="page-header"><h1>Histórico de atendimentos</h1><div class="page-header-actions"><select class="select-sm"><option>Últimos 30 dias</option><option>Últimos 90 dias</option><option>Este ano</option><option>Todos</option></select><select class="select-sm"><option>Todos os canais</option><option>Ligação</option><option>WhatsApp</option><option>E-mail</option><option>Presencial</option></select></div></div>
+        <div id="historico-list"></div>
+      </section>
+
+      <!-- RELATÓRIOS -->
+      <section class="page" id="page-relatorios">
+        <div class="page-header"><h1>Relatórios e métricas</h1></div>
+        <div class="grid g2" style="margin-bottom:1.5rem">
+          <div class="card"><div class="card-header"><i class="ti ti-chart-bar"></i><span>Atendimentos por canal</span></div><div class="card-body"><div class="bar-chart" id="chart-canal"></div></div></div>
+          <div class="card"><div class="card-header"><i class="ti ti-star"></i><span>NPS médio por mês</span></div><div class="card-body"><div class="bar-chart" id="chart-nps"></div></div></div>
+        </div>
+        <div class="card"><div class="card-header"><i class="ti ti-users"></i><span>Desempenho por atendente</span></div><div class="card-body"><div id="chart-atendentes"></div></div></div>
+      </section>
+
+    </div>
+  </main>
+  <div class="toast" id="toast"></div>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
